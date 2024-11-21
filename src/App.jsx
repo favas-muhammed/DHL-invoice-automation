@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 
 function App() {
   const [pdfFiles, setPdfFiles] = useState([]);
   const [excelFile, setExcelFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [referenceColumn, setReferenceColumn] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -67,7 +68,79 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4"> DHL Invoice Automation</h1>
+      <h1 className="text-2xl font-bold mb-4">DHL Invoice Automation</h1>
+
+      {/* Excel Processor Section */}
+      <div className="mb-8 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-4">Excel Row Separator</h2>
+        <form onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData();
+          formData.append("excel", excelFile);
+          formData.append("referenceColumn", referenceColumn);
+
+          try {
+            const response = await axios.post(
+              "http://localhost:5000/process-excel",
+              formData,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+                responseType: "blob",
+                withCredentials: true,
+              }
+            );
+
+            // Create download link for the file
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "processed_excel.xlsx");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+
+            setMessage("Success: Excel file processed successfully!");
+          } catch (error) {
+            setMessage("Error: Failed to process Excel file");
+            console.error("Processing error:", error);
+          }
+        }} className="space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label className="block mb-2">Excel File:</label>
+              <input
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={(e) => setExcelFile(e.target.files[0])}
+                className="border p-2 w-full"
+                required
+              />
+            </div>
+            <div className="w-32">
+              <label className="block mb-2">Reference Column:</label>
+              <input
+                type="text"
+                placeholder="e.g., A, B, AA"
+                className="border p-2 w-full"
+                onChange={(e) => setReferenceColumn(e.target.value.toUpperCase())}
+                pattern="[A-Za-z]+"
+                required
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Process Excel
+          </button>
+        </form>
+      </div>
+
+      <h2 className="text-xl font-semibold mb-4">Invoice Processing</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
