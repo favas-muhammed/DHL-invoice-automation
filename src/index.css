@@ -4,15 +4,93 @@
   font-weight: 400;
 }
 
-body {
+/*body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-}
+}*/
 
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-image: url("../styles/bg.jpg");
+  background-size: cover;
+  background-position: center;
+  color: #333; /* Set a default text color */
+}
+
+.container {
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.8
+  ); /* White background with transparency */
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 600px; /* Limit the width of the container */
+  margin: 50px auto; /* Center the container */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+}
+
+h1 {
+  text-align: center; /* Center the heading */
+  margin-bottom: 20px;
+}
+h4 {
+  text-align: center; /* Center the heading */
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold; /* Make labels bold */
+}
+
+input[type="file"] {
+  border: 1px solid #ccc; /* Add a border to file inputs */
+  border-radius: 4px;
+  padding: 10px;
+  width: calc(100% - 20px); /* Adjust width for padding */
+}
+
+button {
+  width: 100%; /* Make button full width */
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+button:disabled {
+  background-color: #ccc; /* Grey out disabled button */
+  cursor: not-allowed; /* Change cursor for disabled button */
+}
+
+.mt-4 {
+  margin-top: 1rem; /* Adjust margin for message */
+}
+
+.bg-red-100 {
+  background-color: rgba(255, 0, 0, 0.1); /* Light red background for errors */
+}
+
+.bg-green-100 {
+  background-color: rgba(
+    0,
+    255,
+    0,
+    0.1
+  ); /* Light green background for success */
 }
