@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function App() {
-  const [pdfFile, setPdfFile] = useState(null);
+  const [pdfFiles, setPdfFiles] = useState([]);
   const [excelFile, setExcelFile] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,9 @@ function App() {
 
     try {
       const formData = new FormData();
-      formData.append("pdf", pdfFile);
+      pdfFiles.forEach((file, index) => {
+        formData.append("pdfs", file);
+      });
       formData.append("excel", excelFile);
 
       const response = await axios.post(
@@ -73,10 +75,14 @@ function App() {
           <input
             type="file"
             accept=".pdf"
-            onChange={(e) => setPdfFile(e.target.files[0])}
+            multiple
+            onChange={(e) => setPdfFiles(Array.from(e.target.files))}
             className="border p-2 w-full"
             required
           />
+          <div className="mt-2 text-sm text-gray-600">
+            {pdfFiles.length > 0 && `Selected ${pdfFiles.length} PDF file(s)`}
+          </div>
         </div>
 
         <div>
