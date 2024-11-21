@@ -81,7 +81,8 @@ function App() {
             required
           />
           <div className="mt-2 text-sm text-gray-600">
-            {pdfFiles.length > 0 && `Selected ${pdfFiles.length} PDF file(s)`}
+            {pdfFiles.length > 0 &&
+              `Selected ${pdfFiles.length} PDF file(s) (max 100)`}
           </div>
         </div>
 
