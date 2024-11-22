@@ -6,6 +6,8 @@ function App() {
   const [excelFile, setExcelFile] = useState(null);
   const [message, setMessage] = useState("");
   const [referenceColumn, setReferenceColumn] = useState("");
+  const [calculateTotals, setCalculateTotals] = useState(false);
+  const [totalColumn, setTotalColumn] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -78,6 +80,8 @@ function App() {
           const formData = new FormData();
           formData.append("excel", excelFile);
           formData.append("referenceColumn", referenceColumn);
+          formData.append("calculateTotals", calculateTotals.toString());
+          formData.append("totalColumn", totalColumn);
 
           try {
             const response = await axios.post(
@@ -130,6 +134,29 @@ function App() {
                 required
               />
             </div>
+          </div>
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="calculateTotals"
+              checked={calculateTotals}
+              onChange={(e) => setCalculateTotals(e.target.checked)}
+              className="form-checkbox h-4 w-4"
+            />
+            <label htmlFor="calculateTotals" className="text-sm">
+              Calculate totals for specified column
+            </label>
+            {calculateTotals && (
+              <input
+                type="text"
+                placeholder="Column (e.g., A, B)"
+                value={totalColumn}
+                onChange={(e) => setTotalColumn(e.target.value.toUpperCase())}
+                className="border p-1 ml-2 w-20 text-sm"
+                pattern="[A-Za-z]+"
+                required={calculateTotals}
+              />
+            )}
           </div>
           <button
             type="submit"
