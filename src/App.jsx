@@ -10,6 +10,7 @@ function App() {
   const [calculateTotals, setCalculateTotals] = useState(false);
   const [totalColumn, setTotalColumn] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,14 +34,13 @@ function App() {
           },
           responseType: "blob",
           withCredentials: true,
-          timeout: 60000, // Increased timeout to 60 seconds
+          timeout: 60000,
           maxContentLength: Infinity,
           maxBodyLength: Infinity,
-          validateStatus: (status) => status < 500, // Treat only 500+ as errors
+          validateStatus: (status) => status < 500,
         }
       );
 
-      // Create download link for the file
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -54,7 +54,6 @@ function App() {
     } catch (error) {
       let errorMessage;
       if (error.response) {
-        // Server responded with an error
         errorMessage = error.response.data.error || "Server error occurred";
       } else if (error.request) {
         errorMessage =
@@ -71,7 +70,71 @@ function App() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">DHL Invoice Automation</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">DHL Invoice Automation</h1>
+        <div className="relative">
+          <button
+            onClick={() => setShowAbout(!showAbout)}
+            className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          >
+            About
+          </button>
+          {showAbout && (
+            <div className="absolute right-0 mt-2 p-4 bg-white border rounded shadow-lg z-10 w-64">
+              <p className="mb-2">Created by Favas Muhammed</p>
+              <a
+                href="https://github.com/favas-muhammed/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-700"
+              >
+                GitHub Profile
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Invoice Processing Section */}
+      <div className="mb-8 p-4 border rounded">
+        <h2 className="text-xl font-semibold mb-4">Invoice Processing</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-2">DHL invoice:</label>
+            <input
+              type="file"
+              accept=".pdf"
+              multiple
+              onChange={(e) => setPdfFiles(Array.from(e.target.files))}
+              className="border p-2 w-full"
+              required
+            />
+            <div className="mt-2 text-sm text-gray-600">
+              {pdfFiles.length > 0 &&
+                `Selected ${pdfFiles.length} PDF file(s) (max 100)`}
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-2">Excel File:</label>
+            <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={(e) => setExcelFile(e.target.files[0])}
+              className="border p-2 w-full"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            {loading ? "Processing..." : "Upload and Process"}
+          </button>
+        </form>
+      </div>
 
       {/* Excel Processor Section */}
       <div className="mb-8 p-4 border rounded">
@@ -100,7 +163,6 @@ function App() {
                 }
               );
 
-              // Create download link for the file
               const url = window.URL.createObjectURL(new Blob([response.data]));
               const link = document.createElement("a");
               link.href = url;
@@ -190,45 +252,6 @@ function App() {
           </button>
         </form>
       </div>
-
-      <h2 className="text-xl font-semibold mb-4">Invoice Processing</h2>
-
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-2">DHL invoice:</label>
-          <input
-            type="file"
-            accept=".pdf"
-            multiple
-            onChange={(e) => setPdfFiles(Array.from(e.target.files))}
-            className="border p-2 w-full"
-            required
-          />
-          <div className="mt-2 text-sm text-gray-600">
-            {pdfFiles.length > 0 &&
-              `Selected ${pdfFiles.length} PDF file(s) (max 100)`}
-          </div>
-        </div>
-
-        <div>
-          <label className="block mb-2">Excel File:</label>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={(e) => setExcelFile(e.target.files[0])}
-            className="border p-2 w-full"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          {loading ? "Processing..." : "Upload and Process"}
-        </button>
-      </form>
 
       {message && (
         <div
