@@ -5,6 +5,7 @@ function App() {
   const [pdfFiles, setPdfFiles] = useState([]);
   const [excelFile, setExcelFile] = useState(null);
   const [message, setMessage] = useState("");
+  const [useReferenceColumn, setUseReferenceColumn] = useState(false);
   const [referenceColumn, setReferenceColumn] = useState("");
   const [calculateTotals, setCalculateTotals] = useState(false);
   const [totalColumn, setTotalColumn] = useState("");
@@ -75,43 +76,48 @@ function App() {
       {/* Excel Processor Section */}
       <div className="mb-8 p-4 border rounded">
         <h2 className="text-xl font-semibold mb-4">Excel Row Separator</h2>
-        <form onSubmit={async (e) => {
-          e.preventDefault();
-          const formData = new FormData();
-          formData.append("excel", excelFile);
-          formData.append("referenceColumn", referenceColumn);
-          formData.append("calculateTotals", calculateTotals.toString());
-          formData.append("totalColumn", totalColumn);
+        <form
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append("excel", excelFile);
+            if (useReferenceColumn) {
+              formData.append("referenceColumn", referenceColumn);
+            }
+            formData.append("calculateTotals", calculateTotals.toString());
+            formData.append("totalColumn", totalColumn);
 
-          try {
-            const response = await axios.post(
-              "http://localhost:5000/process-excel",
-              formData,
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-                responseType: "blob",
-                withCredentials: true,
-              }
-            );
+            try {
+              const response = await axios.post(
+                "http://localhost:5000/process-excel",
+                formData,
+                {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                  },
+                  responseType: "blob",
+                  withCredentials: true,
+                }
+              );
 
-            // Create download link for the file
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", "processed_excel.xlsx");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
+              // Create download link for the file
+              const url = window.URL.createObjectURL(new Blob([response.data]));
+              const link = document.createElement("a");
+              link.href = url;
+              link.setAttribute("download", "processed_excel.xlsx");
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              window.URL.revokeObjectURL(url);
 
-            setMessage("Success: Excel file processed successfully!");
-          } catch (error) {
-            setMessage("Error: Failed to process Excel file");
-            console.error("Processing error:", error);
-          }
-        }} className="space-y-4">
+              setMessage("Success: Excel file processed successfully!");
+            } catch (error) {
+              setMessage("Error: Failed to process Excel file");
+              console.error("Processing error:", error);
+            }
+          }}
+          className="space-y-4"
+        >
           <div className="flex gap-4">
             <div className="flex-1">
               <label className="block mb-2">Excel File:</label>
@@ -124,15 +130,33 @@ function App() {
               />
             </div>
             <div className="w-32">
-              <label className="block mb-2">Reference Column:</label>
-              <input
-                type="text"
-                placeholder="e.g., A, B, AA"
-                className="border p-2 w-full"
-                onChange={(e) => setReferenceColumn(e.target.value.toUpperCase())}
-                pattern="[A-Za-z]+"
-                required
-              />
+              <div className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  id="useReferenceColumn"
+                  checked={useReferenceColumn}
+                  onChange={(e) => setUseReferenceColumn(e.target.checked)}
+                  className="form-checkbox h-4 w-4"
+                />
+                <label htmlFor="useReferenceColumn" className="ml-2 text-sm">
+                  Use Reference
+                </label>
+              </div>
+              {useReferenceColumn && (
+                <>
+                  <label className="block mb-2">Reference Column:</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., A, B, AA"
+                    className="border p-2 w-full"
+                    onChange={(e) =>
+                      setReferenceColumn(e.target.value.toUpperCase())
+                    }
+                    pattern="[A-Za-z]+"
+                    required={useReferenceColumn}
+                  />
+                </>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2 mt-2">
